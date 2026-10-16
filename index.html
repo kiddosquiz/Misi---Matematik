@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Misi Matematik</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#b8f3ff,#e6d4ff);
+  color:#26345b;text-align:center;padding:20px;
+}
+.card{
+  max-width:480px;margin:15px auto;background:white;
+  padding:24px;border-radius:28px;
+  box-shadow:0 8px 20px #6574a533;
+}
+h1{color:#7048c8;margin-bottom:5px}
+.mascot{font-size:65px}
+.score{font-weight:bold;color:#e58b20}
+.question{font-size:38px;font-weight:bold;margin:24px 0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{
+  border:0;border-radius:16px;padding:16px;
+  font-size:22px;font-weight:bold;cursor:pointer;
+  background:#e8e0ff;color:#5536a2;
+}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.65}
+#message{min-height:28px;font-weight:bold;margin:15px 0}
+#next{background:#ffca58;color:#573900;width:100%}
+.small{font-size:14px;color:#667}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="mascot">🚀🧮</div>
+  <h1>Misi Matematik</h1>
+  <p>Jom jadi wira matematik!</p>
+  <p class="score">⭐ Markah: <span id="score">0</span></p>
+  <p id="progress">Soalan 1</p>
+  <div class="question" id="question">2 + 3 = ?</div>
+  <div class="answers" id="answers"></div>
+  <p id="message">Pilih jawapan yang betul!</p>
+  <button id="next" hidden onclick="nextQuestion()">Soalan Seterusnya ➜</button>
+  <p class="small">Misi untuk murid Tahun 1–3</p>
+</div>
+<script>
+let score=0,round=0,answer=0,locked=false;
+const total=10;
+function makeQuestion(){
+  locked=false;
+  document.getElementById("next").hidden=true;
+  document.getElementById("message").textContent="Pilih jawapan yang betul!";
+  let a=Math.floor(Math.random()*10)+1;
+  let b=Math.floor(Math.random()*10)+1;
+  answer=a+b;
+  document.getElementById("question").textContent=a+" + "+b+" = ?";
+  document.getElementById("progress").textContent="Soalan "+(round+1)+" daripada "+total;
+  let choices=[answer];
+  while(choices.length<4){
+    let n=Math.max(0,answer+Math.floor(Math.random()*11)-5);
+    if(!choices.includes(n)) choices.push(n);
+  }
+  choices.sort(()=>Math.random()-0.5);
+  const box=document.getElementById("answers");
+  box.innerHTML="";
+  choices.forEach(n=>{
+    const btn=document.createElement("button");
+    btn.textContent=n;
+    btn.onclick=()=>checkAnswer(n,btn);
+    box.appendChild(btn);
+  });
+}
+function checkAnswer(n,btn){
+  if(locked)return;
+  locked=true;
+  document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+  if(n===answer){
+    score+=10;
+    document.getElementById("message").textContent="Hebat! Jawapan betul! 🎉";
+    btn.style.background="#b8f5c5";
+  }else{
+    document.getElementById("message").textContent="Belum tepat. Jawapan: "+answer+" 😊";
+    btn.style.background="#ffd0d0";
+  }
+  document.getElementById("score").textContent=score;
+  document.getElementById("next").hidden=false;
+  document.getElementById("next").textContent=round===total-1?"Lihat Keputusan 🏆":"Soalan Seterusnya ➜";
+}
+function nextQuestion(){
+  round++;
+  if(round>=total){
+    document.querySelector(".card").innerHTML=
+      '<div class="mascot">🏆🎉</div><h1>Misi Selesai!</h1>'+
+      '<div class="question">Markah: '+score+'/100</div>'+
+      '<p>'+ (score>=70?"Hebat! Anda wira matematik!":"Bagus mencuba! Teruskan berlatih!")+'</p>'+
+      '<button id="next" onclick="location.reload()">Main Semula 🔄</button>';
+    return;
+  }
+  makeQuestion();
+}
+makeQuestion();
+</script>
+</body>
+</html>
